@@ -1,31 +1,40 @@
-// this is what you would do if you liked things to be easy:
-// var stringifyJSON = JSON.stringify;
 
-// but you don't so you're going to write it from scratch:
-var stringifyJSON = function(obj) {
-	var objstring='{';
-  for (var key in obj){
-    if (obj.hasOwnProperty(key)) {
-      if (typeof obj[key]==='string') {
-        objstring += '"' + key + '"' + ':' + obj[key];
-      }
-      if (typeof obj[key]==='object') {
-        objstring += stringifyJSON(obj[key]);
-      }
-      if (typeof obj[key]==='array') {
-        objstring += '[';
-        for (var i =0; i<obj[key].length; i++){
-          stringfyJson(obj[key][i]);
+var stringifyJSON = function(obj){
+    //check if null
+    if(obj === null) {
+        return 'null';
+    }
+    //check if num / boolean
+    else if(typeof obj === 'number' || typeof obj === 'boolean') {
+        return ''+obj;
+    }
+    //check if string
+    else if(typeof obj === 'string'){
+        return '"'+ obj + '"';
+    }
+    //check if array
+    else if(Array.isArray(obj)) {
+        var arrstring ='[';
+        for (var i=0; i<obj.length;i++){
+          arrstring += stringifyJSON(obj[i]);
+          if (i<obj.length-1){
+            arrstring +=',';
+          }
         }
-        objstring += ']';
+        return arrstring+=']';
+    }
+    else if(typeof obj === 'object') {
+      var count =0;
+      var objstring='{';
+      for (var key in obj) {
+        count++
+        if (obj.hasOwnProperty(key)&& key != 'undefined' && key!='functions') {
+          objstring+='"' + key + '":' +stringifyJSON(obj[key]);
+        }
+        if (count<Object.keys(obj).length && obj!='{}'&&key != 'undefined' && key!='functions'){
+          objstring +=','
+       }
       }
-
-  }
-
-  // your code goes here
-  // every thing in obj surronded by quotes
-  // all keys surrounded by quotes
-  // all object types that are strings surronded by quotes
-  // if array add [] to string
-  return objstring + '}';
-}; 
+      return objstring+='}'
+    }
+};
